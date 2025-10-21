@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: wordapp-backend-prod
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/wordapp
+      - NODE_ENV=production
+    depends_on:
+      - mongo
+    networks:
+      - wordapp-network
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+    container_name: wordapp-frontend-prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - wordapp-network
+    restart: always
+
+  mongo:
+    image: mongo:6
+    container_name: wordapp-mongo-prod
+    volumes:
+      - mongo-data-prod:/data/db
+    networks:
+      - wordapp-network
+    restart: always
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo-data-prod:
+
+networks:
+  wordapp-network:
+    driver: bridge
+
