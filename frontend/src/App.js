@@ -16,7 +16,7 @@ const AppContent = () => {
   const [error, setError] = useState(null);
   const [showAuthForm, setShowAuthForm] = useState('login'); // 'login' or 'register'
   
-  const { isAuthenticated, loading: authLoading, user } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
