@@ -2,7 +2,7 @@ const Word = require('../models/Word');
 
 exports.getAllWords = async (req, res) => {
   try {
-    const words = await Word.find().sort({ createdAt: -1 });
+    const words = await Word.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json({ success: true, data: words });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -33,10 +33,11 @@ exports.createWord = async (req, res) => {
 
 exports.updateWord = async (req, res) => {
   try {
-    const word = await Word.findByIdAndUpdate(req.params.id, req.body, { 
-      new: true, 
-      runValidators: true 
-    });
+    const word = await Word.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      req.body, 
+      { new: true, runValidators: true }
+    );
     if (!word) return res.status(404).json({ success: false, message: 'Word not found' });
     res.json({ success: true, data: word });
   } catch (error) {
@@ -46,7 +47,7 @@ exports.updateWord = async (req, res) => {
 
 exports.deleteWord = async (req, res) => {
   try {
-    const word = await Word.findByIdAndDelete(req.params.id);
+    const word = await Word.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!word) return res.status(404).json({ success: false, message: 'Word not found' });
     res.json({ success: true, message: 'Word deleted' });
   } catch (error) {
@@ -57,7 +58,7 @@ exports.deleteWord = async (req, res) => {
 // Get single word
 exports.getWord = async (req, res) => {
   try {
-    const word = await Word.findById(req.params.id);
+    const word = await Word.findOne({ _id: req.params.id, user: req.user.id });
     if (!word) return res.status(404).json({ success: false, message: 'Word not found' });
     res.json({ success: true, data: word });
   } catch (error) {
