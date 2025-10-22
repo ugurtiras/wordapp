@@ -15,12 +15,13 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
+app.use('/api/auth', require('./routes/auth'));  // ← YENİ
 app.use('/api/words', require('./routes/words'));
 
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
-    message: 'Server is running with Docker! 🐳',
+    message: 'Server is running',
     timestamp: new Date().toISOString()
   });
 });
