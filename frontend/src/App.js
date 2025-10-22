@@ -1,27 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
+import Header from './components/Header';
 import WordForm from './components/WordForm';
 import WordList from './components/WordList';
 import { wordService } from './services/api';
 
-function App() {
+// Main App component wrapped with auth logic
+const AppContent = () => {
   const [words, setWords] = useState([]);
   const [editingWord, setEditingWord] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showAuthForm, setShowAuthForm] = useState('login'); // 'login' or 'register'
+  
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
 
   useEffect(() => {
-    fetchWords();
-  }, []);
+    if (isAuthenticated) {
+      fetchWords();
+    }
+  }, [isAuthenticated]);
 
   const fetchWords = async () => {
     try {
       setLoading(true);
       const response = await wordService.getAllWords();
-      setWords(response.data.data);
+      setWords(response.data.data || []);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch words. Is the backend running?');
+      setError('Kelimeler yüklenirken hata oluştu');
       console.error(err);
     } finally {
       setLoading(false);
@@ -38,18 +48,18 @@ function App() {
       }
       fetchWords();
     } catch (err) {
-      setError('Failed to save word');
+      setError('Kelime kaydedilirken hata oluştu');
       console.error(err);
     }
   };
 
   const handleDeleteWord = async (id) => {
-    if (window.confirm('Are you sure you want to delete this word?')) {
+    if (window.confirm('Bu kelimeyi silmek istediğinizden emin misiniz?')) {
       try {
         await wordService.deleteWord(id);
         fetchWords();
       } catch (err) {
-        setError('Failed to delete word');
+        setError('Kelime silinirken hata oluştu');
         console.error(err);
       }
     }
@@ -63,16 +73,52 @@ function App() {
     setEditingWord(null);
   };
 
+  // Show loading screen while checking authentication
+  if (authLoading) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner">🔄</div>
+        <p>Yükleniyor...</p>
+      </div>
+    );
+  }
+
+  // Show auth forms if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="App">
+        {showAuthForm === 'login' ? (
+          <LoginForm onSwitchToRegister={() => setShowAuthForm('register')} />
+        ) : (
+          <RegisterForm onSwitchToLogin={() => setShowAuthForm('login')} />
+        )}
+      </div>
+    );
+  }
+
+  // Main app content for authenticated users
   return (
     <div className="App">
-      <header className="app-header">
-        <h1>📚 Word Learning App</h1>
-        <p>Master new words every day</p>
-      </header>
+      <Header />
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="error-message">
+          {error}
+          <button 
+            className="error-close" 
+            onClick={() => setError(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="app-container">
+        <div className="welcome-section">
+          <h2>🎯 Bugün hangi kelimeleri öğreneceksin?</h2>
+          <p>Kelime dağarcığını genişletmeye devam et!</p>
+        </div>
+
         <div className="form-section">
           <WordForm
             onSubmit={handleAddWord}
@@ -83,7 +129,10 @@ function App() {
 
         <div className="list-section">
           {loading ? (
-            <div className="loading">Loading words...</div>
+            <div className="loading">
+              <div className="loading-spinner">🔄</div>
+              <p>Kelimeler yükleniyor...</p>
+            </div>
           ) : (
             <WordList
               words={words}
@@ -94,6 +143,15 @@ function App() {
         </div>
       </div>
     </div>
+  );
+};
+
+// Main App component with AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
