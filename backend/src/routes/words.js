@@ -11,12 +11,10 @@ const {
 } = require('../controllers/wordController');
 const { protect } = require('../middleware/auth');
 
-// Public routes (authentication gerekmez)
-router.get('/', getAllWords);
-router.get('/level/:level', getWordsByLevel);
-router.get('/:id', getWord);
-
 // Protected routes (authentication gerekir)
+router.get('/', protect, getAllWords);
+router.get('/level/:level', protect, getWordsByLevel);
+router.get('/:id', protect, getWord);
 router.post('/', protect, createWord);
 router.put('/:id', protect, updateWord);
 router.delete('/:id', protect, deleteWord);

@@ -28,8 +28,7 @@ const AppContent = () => {
     try {
       setLoading(true);
       const response = await wordService.getAllWords();
-      setWords(response.data.data || []);
-      setError(null);
+      setWords(response.data.data);
     } catch (err) {
       setError('Kelimeler yüklenirken hata oluştu');
       console.error(err);
