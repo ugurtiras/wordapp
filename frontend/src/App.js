@@ -15,6 +15,7 @@ const AppContent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAuthForm, setShowAuthForm] = useState('login'); // 'login' or 'register'
+  const [showWordCards, setShowWordCards] = useState(false); // Kelime kartlarını göster/gizle
   
   const { isAuthenticated, loading: authLoading } = useAuth();
 
@@ -114,32 +115,120 @@ const AppContent = () => {
 
       <div className="app-container">
         <div className="welcome-section">
-          <h2>🎯 Bugün hangi kelimeleri öğreneceksin?</h2>
-          <p>Kelime dağarcığını genişletmeye devam et!</p>
+          <h2>🎯 Kelime Dağarcığın</h2>
+          <p>Toplam {words.length} kelime öğrendin!</p>
         </div>
 
-        <div className="form-section">
-          <WordForm
-            onSubmit={handleAddWord}
-            editingWord={editingWord}
-            onCancel={handleCancelEdit}
-          />
-        </div>
-
-        <div className="list-section">
-          {loading ? (
-            <div className="loading">
-              <div className="loading-spinner">🔄</div>
-              <p>Kelimeler yükleniyor...</p>
+        {!showWordCards ? (
+          // Kelime Listesi Görünümü
+          <div className="word-list-view">
+            <div className="controls">
+              <button 
+                className="btn btn-primary"
+                onClick={() => setShowWordCards(true)}
+              >
+                📚 Kelime Kartlarını Göster
+              </button>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setEditingWord({})}
+              >
+                ➕ Yeni Kelime Ekle
+              </button>
             </div>
-          ) : (
-            <WordList
-              words={words}
-              onDelete={handleDeleteWord}
-              onEdit={handleEditWord}
+
+            {loading ? (
+              <div className="loading">
+                <div className="loading-spinner">🔄</div>
+                <p>Kelimeler yükleniyor...</p>
+              </div>
+            ) : (
+              <div className="word-list-table">
+                <h3>Kelime Listesi</h3>
+                {words.length === 0 ? (
+                  <div className="empty-state">
+                    <p>Henüz kelime eklenmemiş. İlk kelimeni ekle!</p>
+                  </div>
+                ) : (
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Kelime</th>
+                        <th>Anlamı</th>
+                        <th>Seviye</th>
+                        <th>İşlemler</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {words.map((word) => (
+                        <tr key={word._id}>
+                          <td className="word-column">{word.word}</td>
+                          <td className="meaning-column">{word.meaning}</td>
+                          <td>
+                            <span className={`level-badge level-${word.level.toLowerCase()}`}>
+                              {word.level}
+                            </span>
+                          </td>
+                          <td className="actions-column">
+                            <button 
+                              className="btn-edit"
+                              onClick={() => setEditingWord(word)}
+                              title="Düzenle"
+                            >
+                              ✏️
+                            </button>
+                            <button 
+                              className="btn-delete"
+                              onClick={() => handleDeleteWord(word._id)}
+                              title="Sil"
+                            >
+                              🗑️
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          // Kelime Kartları Görünümü
+          <div className="word-cards-view">
+            <div className="controls">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowWordCards(false)}
+              >
+                ← Liste Görünümüne Dön
+              </button>
+            </div>
+            
+            {loading ? (
+              <div className="loading">
+                <div className="loading-spinner">🔄</div>
+                <p>Kelimeler yükleniyor...</p>
+              </div>
+            ) : (
+              <WordList
+                words={words}
+                onDelete={handleDeleteWord}
+                onEdit={handleEditWord}
+              />
+            )}
+          </div>
+        )}
+
+        {editingWord && (
+          <div className="form-section">
+            <WordForm
+              onSubmit={handleAddWord}
+              editingWord={editingWord}
+              onCancel={handleCancelEdit}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

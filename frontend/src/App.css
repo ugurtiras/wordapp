@@ -345,3 +345,181 @@ body {
   color: #999;
   font-size: 1.2rem;
 }
+
+/* Word List Table View */
+.word-list-view {
+  margin-top: 30px;
+}
+
+.controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  justify-content: center;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+  border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.word-list-table {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+}
+
+.word-list-table h3 {
+  margin-bottom: 20px;
+  color: #334155;
+  font-size: 1.5rem;
+}
+
+.word-list-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.word-list-table th,
+.word-list-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.word-list-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.word-list-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.word-column {
+  font-weight: 600;
+  color: #334155;
+  font-size: 16px;
+}
+
+.meaning-column {
+  color: #64748b;
+  max-width: 300px;
+}
+
+.level-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.level-a1 { background: #dcfce7; color: #166534; }
+.level-a2 { background: #dbeafe; color: #1e40af; }
+.level-b1 { background: #fef3c7; color: #92400e; }
+.level-b2 { background: #fed7aa; color: #c2410c; }
+.level-c1 { background: #fecaca; color: #dc2626; }
+.level-c2 { background: #e5e7eb; color: #374151; }
+
+.actions-column {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+  background: #f0f9ff;
+}
+
+.btn-delete:hover {
+  background: #fef2f2;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  color: #64748b;
+}
+
+.empty-state p {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Word Cards View */
+.word-cards-view {
+  margin-top: 30px;
+}
+
+.form-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .word-list-table {
+    overflow-x: auto;
+  }
+  
+  .word-list-table table {
+    min-width: 600px;
+  }
+}
