@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import './ListEdit.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -12,18 +12,15 @@ import { wordService } from './services/api';
 const AppContent = () => {
   const [words, setWords] = useState([]);
   const [wordLists, setWordLists] = useState([]); // Kelime listeleri
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAuthForm, setShowAuthForm] = useState('login');
   
   // States
-  const [selectedList, setSelectedList] = useState(null);
   const [editingWord, setEditingWord] = useState(null);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState(null);
   
   // Quiz states
-  const [quizMode, setQuizMode] = useState(false);
   const [currentQuizWord, setCurrentQuizWord] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [quizWords, setQuizWords] = useState([]);
@@ -32,27 +29,17 @@ const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchWords();
-      fetchWordLists();
-    }
-  }, [isAuthenticated]);
-
-  const fetchWords = async () => {
+  const fetchWords = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await wordService.getAllWords();
       setWords(response.data.data);
     } catch (err) {
       setError('Kelimeler yüklenirken hata oluştu');
       console.error(err);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchWordLists = async () => {
+  const fetchWordLists = useCallback(async () => {
     try {
       const userKey = `wordLists_${user?.id || user?.name || user?.username || 'default'}`;
       const lists = JSON.parse(localStorage.getItem(userKey) || '[]');
@@ -61,7 +48,14 @@ const AppContent = () => {
       console.error('Word lists loading error:', err);
       setWordLists([]);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchWords();
+      fetchWordLists();
+    }
+  }, [isAuthenticated, fetchWords, fetchWordLists]);
 
   const createWordList = (listName, selectedWords = []) => {
     const newList = {
@@ -141,11 +135,9 @@ const AppContent = () => {
   };
 
   const startQuiz = (list) => {
-    setSelectedList(list);
     setQuizWords(list.words);
     setCurrentQuizWord(0);
     setShowAnswer(false);
-    setQuizMode(true);
     navigate(`/quiz/${list.id}`);
   };
 
@@ -155,7 +147,6 @@ const AppContent = () => {
       setShowAnswer(false);
     } else {
       // Quiz bitti
-      setQuizMode(false);
       navigate('/');
     }
   };
@@ -392,7 +383,6 @@ const AppContent = () => {
               onNext={nextQuizWord}
               onPrev={prevQuizWord}
               onExit={() => {
-                setQuizMode(false);
                 navigate('/');
               }}
             />} />
