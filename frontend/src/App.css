@@ -31,6 +31,37 @@ body {
   background: linear-gradient(135deg, #CD853F 0%, #D2691E 100%);
 }
 
+/* MOBILE DEBUG - Geçici test için */
+@media (max-width: 768px) {
+  body::before {
+    content: "📱 MOBILE MODE ACTIVE - " attr(data-width);
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: red;
+    color: white;
+    padding: 10px;
+    z-index: 9999;
+    font-size: 14px;
+    border-radius: 0 0 10px 0;
+  }
+}
+
+@media (min-width: 769px) {
+  body::before {
+    content: "💻 DESKTOP MODE";
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: green;
+    color: white;
+    padding: 10px;
+    z-index: 9999;
+    font-size: 14px;
+    border-radius: 0 0 10px 0;
+  }
+}
+
 /* Mobile First Responsive Design */
 @media (max-width: 768px) {
   body {
