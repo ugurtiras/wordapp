@@ -31,20 +31,8 @@ body {
   background: linear-gradient(135deg, #CD853F 0%, #D2691E 100%);
 }
 
-/* MOBILE FORCE OVERRIDES - Daha agresif */
+/* MOBILE FORCE OVERRIDES */
 @media (max-width: 768px) {
-  body::before {
-    content: "📱 MOBILE MODE ACTIVE";
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: red;
-    color: white;
-    padding: 10px;
-    z-index: 9999;
-    font-size: 14px;
-    border-radius: 0 0 10px 0;
-  }
 
   /* FORCE MOBILE NAVIGATION */
   .header-nav {
