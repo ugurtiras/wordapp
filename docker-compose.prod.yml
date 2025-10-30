@@ -5,15 +5,22 @@ services:
     build:
       context: ./backend
     container_name: wordapp-backend-prod
+    ports:
+      - "5000:5000"
     environment:
       - PORT=5000
-      - MONGO_URI=mongodb://mongo:27017/wordapp
+      - MONGO_URI=${MONGO_URI}  # MongoDB Atlas connection string
       - NODE_ENV=production
-    depends_on:
-      - mongo
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=7d
     networks:
       - wordapp-network
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build:
@@ -22,28 +29,13 @@ services:
     container_name: wordapp-frontend-prod
     ports:
       - "80:80"
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
     depends_on:
       - backend
     networks:
       - wordapp-network
     restart: always
-
-  mongo:
-    image: mongo:6
-    container_name: wordapp-mongo-prod
-    volumes:
-      - mongo-data-prod:/data/db
-    networks:
-      - wordapp-network
-    restart: always
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  mongo-data-prod:
 
 networks:
   wordapp-network:
