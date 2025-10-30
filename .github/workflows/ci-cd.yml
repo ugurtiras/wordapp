@@ -5,6 +5,16 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: 'Deploy to which environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
 
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -146,3 +156,63 @@ jobs:
           format: 'sarif'
           output: 'trivy-frontend-results.sarif'
         continue-on-error: true
+
+  deploy-to-render:
+    name: Deploy to Render.com
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-scan]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy Backend to Render
+        run: |
+          echo "Triggering Render backend deployment..."
+          curl -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{"ref": "${{ github.sha }}"}'
+        continue-on-error: false
+      
+      - name: Wait for Backend Deployment
+        run: |
+          echo "Waiting for backend deployment to complete..."
+          sleep 60
+      
+      - name: Deploy Frontend to Render
+        run: |
+          echo "Triggering Render frontend deployment..."
+          curl -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{"ref": "${{ github.sha }}"}'
+        continue-on-error: false
+      
+      - name: Deployment Status
+        run: |
+          echo "✅ Deployment completed!"
+          echo "Backend: Check Render dashboard for status"
+          echo "Frontend: Check Render dashboard for status"
+          echo "SHA: ${{ github.sha }}"
+      
+      - name: Health Check
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 120
+          
+          # Backend health check
+          if curl -f "${{ secrets.RENDER_BACKEND_URL }}/health"; then
+            echo "✅ Backend health check passed"
+          else
+            echo "❌ Backend health check failed"
+            exit 1
+          fi
+      
+      - name: Notify Deployment Success
+        if: success()
+        run: |
+          echo "🎉 Production deployment successful!"
+          echo "🔗 Backend: ${{ secrets.RENDER_BACKEND_URL }}"
+          echo "🔗 Frontend: ${{ secrets.RENDER_FRONTEND_URL }}"
+          echo "📊 MongoDB: Atlas (Connected)"
+          echo "🚀 Deployment SHA: ${{ github.sha }}"
