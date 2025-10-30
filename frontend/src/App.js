@@ -165,37 +165,25 @@ const AppContent = () => {
     }
     
     try {
-      const response = await fetch('http://localhost:5000/api/words', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(newWord)
-      });
+      const response = await wordService.createWord(newWord);
+      const addedWord = response.data;
       
-      if (response.ok) {
-        const addedWord = await response.json();
-        
-        // Kelimeler listesini güncelle
-        await fetchWords();
-        
-        // Eğer belirli bir liste için kelime eklendiyse direkt o listeye ekle
-        if (newWord.targetListId) {
-          const targetList = wordLists.find(list => list.id === newWord.targetListId);
-          if (targetList) {
-            addWordToList(addedWord.data, targetList);
-          }
+      // Kelimeler listesini güncelle
+      await fetchWords();
+      
+      // Eğer belirli bir liste için kelime eklendiyse direkt o listeye ekle
+      if (newWord.targetListId) {
+        const targetList = wordLists.find(list => list.id === newWord.targetListId);
+        if (targetList) {
+          addWordToList(addedWord.data || addedWord, targetList);
         }
-        
-        setEditingWord(null);
-      } else {
-        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
-        setError(`Kelime eklenirken hata: ${errorData.message || response.status}`);
       }
+      
+      setEditingWord(null);
     } catch (error) {
       console.error('Network error:', error);
-      setError('Bağlantı hatası. Backend çalışıyor mu kontrol edin.');
+      const errorMessage = error.response?.data?.message || error.message || 'Bilinmeyen hata';
+      setError(`Kelime eklenirken hata: ${errorMessage}`);
     }
   };
 
