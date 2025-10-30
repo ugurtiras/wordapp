@@ -31,10 +31,10 @@ body {
   background: linear-gradient(135deg, #CD853F 0%, #D2691E 100%);
 }
 
-/* MOBILE DEBUG - Geçici test için */
+/* MOBILE FORCE OVERRIDES - Daha agresif */
 @media (max-width: 768px) {
   body::before {
-    content: "📱 MOBILE MODE ACTIVE - " attr(data-width);
+    content: "📱 MOBILE MODE ACTIVE";
     position: fixed;
     top: 0;
     left: 0;
@@ -45,20 +45,45 @@ body {
     font-size: 14px;
     border-radius: 0 0 10px 0;
   }
-}
 
-@media (min-width: 769px) {
-  body::before {
-    content: "💻 DESKTOP MODE";
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: green;
-    color: white;
-    padding: 10px;
-    z-index: 9999;
-    font-size: 14px;
-    border-radius: 0 0 10px 0;
+  /* FORCE MOBILE NAVIGATION */
+  .header-nav {
+    gap: 8px !important;
+    justify-content: center !important;
+    padding: 0 5px !important;
+    flex-direction: column !important;
+  }
+
+  /* FORCE MOBILE BUTTONS */
+  .nav-btn {
+    padding: 18px 25px !important;
+    font-size: 16px !important;
+    min-height: 50px !important;
+    width: 100% !important;
+    max-width: 280px !important;
+    margin: 5px 0 !important;
+  }
+
+  /* FORCE MOBILE HEADER */
+  .header {
+    padding: 10px 15px !important;
+  }
+
+  .header-content {
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+
+  /* FORCE MOBILE CONTAINERS */
+  .app-container {
+    padding: 10px 5px !important;
+  }
+
+  /* FORCE MOBILE WORD GRID */
+  .word-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 0 5px !important;
   }
 }
 
